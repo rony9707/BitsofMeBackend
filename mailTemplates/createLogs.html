@@ -1,0 +1,151 @@
+<!-- logTemplate.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{FILE_NAME}}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #444;
+      background-color: #f0f0f0;
+      padding: 1rem;
+      margin: 0;
+      border-bottom: 2px solid #ddd;
+    }
+
+    #searchBox {
+      display: block;
+      margin: 1rem auto;
+      width: 80%;
+      max-width: 500px;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+      width: 90%;
+      margin: 1rem auto;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    thead th {
+      background-color: #007bff;
+      color: #fff;
+      text-align: left;
+      padding: 0.75rem;
+      font-size: 1rem;
+    }
+
+    tbody td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #eee;
+      word-wrap: break-word;
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: #f7f7f7;
+    }
+
+    tbody tr.error {
+      background-color: #ffe6e6;
+      color: #a94442;
+    }
+
+    tbody tr:hover {
+      background-color: #eaeaea;
+    }
+
+    th,
+    td {
+      text-align: left;
+    }
+
+    @media (max-width: 600px) {
+      table {
+        font-size: 0.9rem;
+      }
+
+      #searchBox {
+        width: 95%;
+      }
+    }
+  </style>
+  <script>
+
+    //let count = 0
+    const searchLogs = () => {
+      //console.log("Count", count++)
+      const input = document.getElementById("searchBox").value.toLowerCase();
+      const rows = document.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const rowText = row.textContent.toLowerCase();
+        row.style.display = rowText.includes(input) ? "" : "none";
+      });
+    }
+
+    const debounce = function (fn, d) {
+      let timer;
+      return function () {
+        let context = this,
+          args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          fn.apply(context, arguments);
+        }, d);
+      }
+    }
+
+    const searchLogs_debounce = debounce(searchLogs, 300)
+
+
+    function highlightErrors() {
+      const rows = document.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        if (row.textContent.includes("Error")) {
+          console.log(row)
+          row.classList.add("error");
+        }
+      });
+    }
+
+    // Run the highlightErrors function when the page loads
+    window.onload = highlightErrors;
+  </script>
+</head>
+
+<body>
+  <h1>{{FILE_NAME}}</h1>
+  <input type="text" id="searchBox" onkeyup="searchLogs_debounce()" placeholder="Search logs...">
+  <table>
+    <thead>
+      <tr>
+        <th>Date & Time</th>
+        <th>IP Address</th>
+        <th>Original URL</th>
+        <th>Username</th>
+        <th>Log Message</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{LOG_ENTRIES}}
+    </tbody>
+  </table>
+</body>
+
+</html>
