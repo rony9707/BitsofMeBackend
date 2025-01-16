@@ -106,10 +106,11 @@ exports.loginUser = async (req, res) => {
       //Creates a JWT token in the cookies
       res.cookie("jwt", token, {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: "none", // Adjust as needed  --need to comment when running server is 192.168.0.103 or else cookie won't be received
-        secure: true // Required for 'None'--need to comment when running server is 192.168.0.103 or else cookie won't be received
-      })
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        sameSite: "None", // Ensure the cookie is available in cross-site requests
+        secure: true,     // Send cookie only over HTTPS
+        partitioned: true // Optional: For browsers supporting the Partitioned attribute
+      });
 
       //Response is sent
       res.status(200).send({

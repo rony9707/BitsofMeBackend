@@ -12,7 +12,12 @@ exports.logoutUser = async (req, res) => {
       logLevel: 'info'
     });
     
-    res.cookie("jwt", "", { maxAge: 0 })
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      maxAge: 0, // Set to 0 to expire immediately
+      sameSite: "None",
+      secure: true
+    });
 
     res.send({
       message: "You have successfully logged out"
