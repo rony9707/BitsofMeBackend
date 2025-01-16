@@ -1,6 +1,6 @@
 const sharp = require('sharp'); // Import sharp for image processing
 const path = require('path');
-const createLogs = require('../common/createLogs');
+const createLogs = require('../common/createMongoLogs');
 const ImageKit = require("imagekit");
 require('dotenv').config()
 
@@ -58,7 +58,7 @@ const processImageTowebp = async (fileBuffer, customDir, filename, originalUrl, 
       webpFilename_100 = webpUploadResponse_100.url; // Save the URL of the uploaded 100x100 image
 
       createLogs({
-        route: "register",
+        route: originalUrl,
         LogMessage: "Image is saved to ImageKit as WebP format",
         originalUrl: originalUrl,
         username: filename,
@@ -68,7 +68,14 @@ const processImageTowebp = async (fileBuffer, customDir, filename, originalUrl, 
 
     return { webpFilename_original, webpFilename_100 };  // Return the WebP 
   } catch (err) {
-    throw new Error('Error processing the image: ' + err.message);
+    createLogs({
+      route: "ERROR",
+      LogMessage: err.message || 'Unknown error',
+      originalUrl: req.originalUrl,
+      username: req.body.username,
+      ip: req.ip,
+      logLevel: 'error'
+    });
   }
 };
 
