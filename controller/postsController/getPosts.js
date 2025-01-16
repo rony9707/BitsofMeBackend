@@ -3,14 +3,6 @@
 const postSchema = require('../../models/post')
 // http://localhost:4000/post/getPosts?limit=5&page=1&db_postTopic=games&tags=oisfndoasdfoaisfdasd&db_postVisibility=private
 
-backendConnectionString = process.env.backendConnectionString
-
-
-if (!backendConnectionString) {
-
-  process.exit(1);
-}
-
 
 exports.getPosts = async (req, res) => {
   try {
@@ -22,7 +14,6 @@ exports.getPosts = async (req, res) => {
     const db_postVisibility = req.query.db_postVisibility || null; // Default: null (fetch all visibility)
 
 
-    console.log(`Requested URL: ${req.originalUrl}`);
     // Calculate the number of documents to skip
     const skip = (page - 1) * limit;
 

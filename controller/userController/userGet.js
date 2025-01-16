@@ -1,5 +1,5 @@
 const userSchema = require('../../models/user')
-const createLogs = require('../../common/createLogs')
+const createLogs = require('../../common/createMongoLogs')
 
 
 exports.getUser = async (req, res) => {
@@ -17,7 +17,8 @@ exports.getUser = async (req, res) => {
       LogMessage: `Request was made for ${local_userId}`,
       originalUrl: req.originalUrl,
       username: user.db_username,
-      ip: req.ip
+      ip: req.ip,
+      logLevel: 'info'
     });
 
     const { db_password,_id,__v, ...userdata } = await user.toJSON()
@@ -28,7 +29,8 @@ exports.getUser = async (req, res) => {
       LogMessage: `Request that was made for ${local_userId} was sent`,
       originalUrl: req.originalUrl,
       username: user.db_username,
-      ip: req.ip
+      ip: req.ip,
+      logLevel: 'info'
     });
   }
   catch (err) {
@@ -37,7 +39,8 @@ exports.getUser = async (req, res) => {
       LogMessage: err,
       originalUrl: 'Error Logs',
       username: 'Error Logs',
-      ip: 'Error Logs'
+      ip: 'Error Logs',
+      logLevel: 'error'
     });
     res.status(500).send({ message: 'Internal Server Error' });
   }

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const createLogs = require('../common/createLogs')
+const createLogs = require('../common/createMongoLogs')
 
 
 //Declare Env variables here
@@ -10,7 +10,8 @@ if (!jwt_key) {
     LogMessage: `Missing required environment variables`,
     originalUrl: 'Error Logs',
     username: 'Error Logs',
-    ip: 'Error Logs'
+    ip: 'Error Logs',
+    logLevel: 'error'
   });
   process.exit(1);
 }
@@ -28,7 +29,8 @@ const authMiddleware = (req, res, next) => {
       LogMessage: `Authorized access was made`,
       originalUrl: req.originalUrl,
       username: 'Not known yet',
-      ip: req.ip
+      ip: req.ip,
+      logLevel: 'info'
     });
 
     jwt.verify(authHeader, jwt_key, async (err, user) => {
@@ -43,7 +45,8 @@ const authMiddleware = (req, res, next) => {
       LogMessage: `Unauthorized access was made`,
       originalUrl: req.originalUrl,
       username: 'Not known yet',
-      ip: req.ip
+      ip: req.ip,
+      logLevel: 'error'
     });
     res.status(401).send({ message: "User not authenticated" });
   }

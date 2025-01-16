@@ -1,7 +1,10 @@
 PORT=
 DBConnectionString=
 frontEndConnectionString=
-backendConnectionString=
 jwt=
 password=
 email=
+
+imagekit_publicKey=,
+imagekit_privateKey= 
+imagekit_urlEndpoint= 

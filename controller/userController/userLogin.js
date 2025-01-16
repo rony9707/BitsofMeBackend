@@ -1,8 +1,9 @@
-const createLogs = require('../../common/createLogs')
+//const createLogs = require('../../common/createLogs')
 const userSchema = require('../../models/user')
 const getCurrentDateTime = require('../../common/getCurrentDateTime')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const createLogs = require('../../common/createMongoLogs')
 
 
 
@@ -15,7 +16,8 @@ if (!jwt_key) {
     LogMessage: `Missing required environment variables`,
     originalUrl: 'Error Logs',
     username: 'Error Logs',
-    ip: 'Error Logs'
+    ip: 'Error Logs',
+    logLevel: 'error'
   });
   process.exit(1);
 }
@@ -45,8 +47,10 @@ exports.loginUser = async (req, res) => {
         LogMessage: `User with IP ${req.ip} tried to login but failed with username as ${local_username} and password as ${local_password}`,
         originalUrl: req.originalUrl,
         username: req.body.username,
-        ip: req.ip
+        ip: req.ip,
+        logLevel: 'error'
       });
+
       return res.status(400).send({
         message: "Invalid credentials"
       })
@@ -59,7 +63,8 @@ exports.loginUser = async (req, res) => {
         LogMessage: `User with IP ${req.ip} tried to login but failed with username as ${local_username} and password as ${local_password}`,
         originalUrl: req.originalUrl,
         username: req.body.username,
-        ip: req.ip
+        ip: req.ip,
+        logLevel: 'error'
       });
       return res.status(400).send({
         message: "Invalid credentials"
@@ -86,7 +91,8 @@ exports.loginUser = async (req, res) => {
           LogMessage: `For user ${isuUserPresent.db_username}', last Login is updated to ${currentDateTime}`,
           originalUrl: req.originalUrl,
           username: req.body.username,
-          ip: req.ip
+          ip: req.ip,
+          logLevel: 'info'
         });
       }
     }
@@ -115,7 +121,8 @@ exports.loginUser = async (req, res) => {
         LogMessage: `For user ${isuUserPresent.db_username}',the login response was sent`,
         originalUrl: req.originalUrl,
         username: req.body.username,
-        ip: req.ip
+        ip: req.ip,
+        logLevel: 'info'
       });
     }
 
@@ -127,7 +134,8 @@ exports.loginUser = async (req, res) => {
       LogMessage: err,
       originalUrl: 'Error Logs',
       username: 'Error Logs',
-      ip: 'Error Logs'
+      ip: 'Error Logs',
+      logLevel: 'error'
     });
     res.status(500).json({ message: err });
   }

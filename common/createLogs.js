@@ -1,3 +1,4 @@
+//TEMP NOT BEING USED BUT LOGS ARE STORED IN MONGO DB
 const fs = require('fs');
 const path = require('path');
 const getCurrentDateTime = require('./getCurrentDateTime');

@@ -1,6 +1,6 @@
 require('dotenv').config()
 const processImageTowebp = require('../../common/processImageTowebp')
-const createLogs = require('../../common/createLogs')
+const createLogs = require('../../common/createMongoLogs')
 const getCurrentDateTime = require('../../common/getCurrentDateTime')
 const bcrypt = require('bcryptjs')
 const userSchema = require('../../models/user')
@@ -10,17 +10,17 @@ const emailTransporter = require('../../common/emailConfig')
 
 
 //Declare Env variables here
-backendConnectionString = process.env.backendConnectionString
 jwt_key = process.env.jwt
 myEmail = process.env.email
 
-if (!backendConnectionString || !jwt_key || !myEmail) {
+if (!jwt_key || !myEmail) {
   createLogs({
     route: "register",
     LogMessage: `Missing required environment variables`,
     originalUrl: 'Error Logs',
     username: 'Error Logs',
-    ip: 'Error Logs'
+    ip: 'Error Logs',
+    logLevel: 'error'
   });
   process.exit(1);
 }
@@ -35,7 +35,8 @@ const registerUser = async (req, res) => {
         LogMessage: "User Profile Pic is present",
         originalUrl: req.originalUrl,
         username: req.body.username,
-        ip: req.ip
+        ip: req.ip,
+        logLevel: 'info'
       });
     } else {
       createLogs({
@@ -43,7 +44,8 @@ const registerUser = async (req, res) => {
         LogMessage: "User Profile pic is not present",
         originalUrl: req.originalUrl,
         username: req.body.username,
-        ip: req.ip
+        ip: req.ip,
+        logLevel: 'error'
       });
       return res.status(400).send({
         message: "Image is not sent"
@@ -86,7 +88,8 @@ const registerUser = async (req, res) => {
         LogMessage: `${local_email}'s email ${local_email} was already present`,
         originalUrl: req.originalUrl,
         username: req.body.username,
-        ip: req.ip
+        ip: req.ip,
+        logLevel: 'info'
       });
       return res.status(400).send({
         message: "Your Email is already registered"
@@ -99,7 +102,8 @@ const registerUser = async (req, res) => {
         LogMessage: `${local_email}'s username ${local_username} was already present`,
         originalUrl: req.originalUrl,
         username: req.body.username,
-        ip: req.ip
+        ip: req.ip,
+        logLevel: 'info'
       });
       return res.status(400).send({
         message: "Your Username is already registered"
@@ -109,21 +113,22 @@ const registerUser = async (req, res) => {
       //START THE REGISTRATION FUNCTIONS IF EVERYTHING IS PRESENT------------------------------------------------------------
 
       // Process the image (convert to WebP and resize it)
-      const { webpFilename, webpFilename_100 } = await processImageTowebp(
+      const { webpFilename_original, webpFilename_100 } = await processImageTowebp(
         req.file.buffer,
-        './uploads/profilePic',
+        '/ProfilePic',
         req.body.username,
         req.originalUrl,
         req.ip
       );
 
-      if (webpFilename && webpFilename_100) {
+      if (webpFilename_original && webpFilename_100) {
         createLogs({
           route: "register",
-          LogMessage: "Image is processed to webp successfully",
+          LogMessage: "Image is processed to webp successfully and uploaded to Imagekit",
           originalUrl: req.originalUrl,
           username: req.body.username,
-          ip: req.ip
+          ip: req.ip,
+          logLevel: 'info'
         });
       } else {
         createLogs({
@@ -131,13 +136,14 @@ const registerUser = async (req, res) => {
           LogMessage: "Image is not processed to webp successfully",
           originalUrl: req.originalUrl,
           username: req.body.username,
-          ip: req.ip
+          ip: req.ip,
+          logLevel: 'error'
         });
       }
 
       // Build the URL to access the uploaded images
-      let local_profilePicUrl = `${backendConnectionString}/uploads/profilePic/${webpFilename}`;
-      let local_profilePicUrl_100 = `${backendConnectionString}/uploads/profilePic/${webpFilename_100}`;
+      let local_profilePicUrl = webpFilename_original;
+      let local_profilePicUrl_100 = webpFilename_100;
 
 
       //Hashed Password
@@ -149,7 +155,8 @@ const registerUser = async (req, res) => {
           LogMessage: `User ${local_email}'s password has been hashed`,
           originalUrl: req.originalUrl,
           username: req.body.username,
-          ip: req.ip
+          ip: req.ip,
+          logLevel: 'info'
         });
       } else {
         createLogs({
@@ -157,7 +164,8 @@ const registerUser = async (req, res) => {
           LogMessage: `User ${local_email}'s password was not hashed`,
           originalUrl: req.originalUrl,
           username: req.body.username,
-          ip: req.ip
+          ip: req.ip,
+          logLevel: 'error'
         });
       }
 
@@ -186,7 +194,8 @@ const registerUser = async (req, res) => {
             LogMessage: `${local_email}'s data is saved in database.`,
             originalUrl: req.originalUrl,
             username: req.body.username,
-            ip: req.ip
+            ip: req.ip,
+            logLevel: 'info'
           });
         }).catch((err) => {
           createLogs({
@@ -194,7 +203,8 @@ const registerUser = async (req, res) => {
             LogMessage: err,
             originalUrl: req.originalUrl,
             username: req.body.username,
-            ip: req.ip
+            ip: req.ip,
+            logLevel: 'error'
           });
         });
 
@@ -209,7 +219,8 @@ const registerUser = async (req, res) => {
             LogMessage: `Could not read html template ${err}`,
             originalUrl: 'Error Logs',
             username: 'Error Logs',
-            ip: 'Error Logs'
+            ip: 'Error Logs',
+            logLevel: 'error'
           });
           return;
         }
@@ -242,7 +253,8 @@ const registerUser = async (req, res) => {
       LogMessage: err,
       originalUrl: 'Error Logs',
       username: 'Error Logs',
-      ip: 'Error Logs'
+      ip: 'Error Logs',
+      logLevel: 'error'
     });
     res.status(500).json({ message: err });
   }
@@ -267,7 +279,8 @@ function sentEmail(mailOPtions, email, originalUrl, username, ip) {
         LogMessage: `For ${email}, some error happened ${err}`,
         originalUrl: originalUrl,
         username: username,
-        ip: ip
+        ip: ip,
+        logLevel: 'error'
       });
     }
     else {
@@ -276,7 +289,8 @@ function sentEmail(mailOPtions, email, originalUrl, username, ip) {
         LogMessage: `For ${email}, Mail was sent`,
         originalUrl: originalUrl,
         username: username,
-        ip: ip
+        ip: ip,
+        logLevel: 'info'
       });
     }
   })
