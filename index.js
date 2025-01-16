@@ -22,24 +22,7 @@ PORT = process.env.PORT
 connectionString = process.env.DBConnectionString
 frontEndConnectionString = process.env.frontEndConnectionString
 
-const server = http.createServer(app);
 
-const io = new Server(server, {
-  cors: {
-    credentials: true,
-    origin: frontEndConnectionString,
-  },
-});
-
-
-io.on('connection',(client)=>{
- //console.log(client)
-  console.log("Connection is made")
-
-  client.on('disconnect', () => {
-    console.log("Client disconnected");
-  });
-})
 
 app.get('/',(req,res)=>{
   const formattedDate = getCurrentDateTime();
@@ -75,7 +58,7 @@ mongoose.connect(connectionString)
   .then(() => {
     console.log("Connected to database");
    
-    server.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`App is listening on port ${PORT}`);
     });
   })
