@@ -27,7 +27,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     credentials: true,
-    origin: "http://localhost:4200",
+    origin: frontEndConnectionString,
   },
 });
 

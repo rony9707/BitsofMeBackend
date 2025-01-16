@@ -59,7 +59,6 @@ exports.createPosts = async (req, res) => {
 
     //Post Images can be empty, only text
     if (req.files) {
-      console.log("No of files,",req.files)
       local_postPics = await processFiles(req.files, '/Posts', local_username, req);
     }
 
