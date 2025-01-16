@@ -157,7 +157,7 @@ const processFiles = async (files, postsSaveFolderPath, local_username, req) => 
 
   createLogs({
     route: "createPosts",
-    LogMessage: `Total time to convert ${countOfImages} images to webP took ${performance.now() - start}ms`,
+    LogMessage: `Total time to convert ${countOfImages} images to webP took ${(performance.now() - start).toFixed(2)}ms`,
     originalUrl: req.originalUrl,
     username: req.body.username,
     ip: req.ip,

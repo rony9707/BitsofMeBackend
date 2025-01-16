@@ -16,7 +16,8 @@ exports.logoutUser = async (req, res) => {
       httpOnly: true,
       maxAge: 0, // Set to 0 to expire immediately
       sameSite: "None",
-      secure: true
+      secure: true,
+      partitioned: true
     });
 
     res.send({
