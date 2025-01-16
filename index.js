@@ -6,8 +6,6 @@ const cors = require('cors')
 require('dotenv').config()
 const getCurrentDateTime = require('./common/getCurrentDateTime')
 const path = require('path');
-const { Server } = require('socket.io'); // Import Socket.IO
-const http = require("http");
 
 
 //Define Routes here
@@ -45,7 +43,7 @@ app.use(express.json())
 
 app.use(express.urlencoded({ extended: true }));
 //express.static() makes the files in the specified directory accessible over HTTP requests.
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
