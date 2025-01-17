@@ -7,7 +7,6 @@ const createLogs = require('../../common/createMongoLogs')
 
 
 
-
 //Declare Env variables here
 jwt_key = process.env.jwt
 if (!jwt_key) {
@@ -105,6 +104,7 @@ exports.loginUser = async (req, res) => {
 
       //Creates a JWT token in the cookies
       res.cookie("jwt", token, {
+        domain: "https://bitsofme-65a1a.web.app",
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
         sameSite: "None", // Ensure the cookie is available in cross-site requests
