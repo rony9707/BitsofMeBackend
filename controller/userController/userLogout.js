@@ -13,7 +13,6 @@ exports.logoutUser = async (req, res) => {
     });
     
     res.cookie("jwt", "", {
-      domain: "https://bitsofme-65a1a.web.app",
       httpOnly: true,
       maxAge: 0, // Set to 0 to expire immediately
       sameSite: "None",
