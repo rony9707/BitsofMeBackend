@@ -5,7 +5,8 @@ const processImageTowebp = require('../../common/processImageTowebp')
 const postSchema = require('../../models/post')
 const createLogs = require('../../common/createMongoLogs')
 const { performance } = require('perf_hooks');
-
+const { Worker } = require('worker_threads');
+const path = require('path');
 
 
 
@@ -120,40 +121,38 @@ exports.createPosts = async (req, res) => {
 const processFiles = async (files, postsSaveFolderPath, local_username, req) => {
   const local_postPics = [];
   const start = performance.now();
-  let countOfImages = 0
-  for (const file of files) {
-    //console.log("No of filessdafsadf,",req.files)
-    try {
-      const { webpFilename_original } = await processImageTowebp(
-        file.buffer, // Buffer of the current file
-        postsSaveFolderPath, // Destination folder path
-        file.originalname, // Original filename
-        req.originalUrl, // Original request URL
-        req.ip // IP address
-      );
+  let countOfImages = 0;
 
-      let postImages = webpFilename_original;
-      // Push the processed file information to the savedFiles array
-      createLogs({
-        route: "createPosts",
-        LogMessage: `Image saved successfully for ${local_username} as name ${postImages}`,
-        originalUrl: req.originalUrl,
-        username: req.body.username,
-        ip: req.ip
+  const workerPromises = files.map(file => {
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(path.join(__dirname, '../../common/processImageWorker.js'), {
+        workerData: {
+          buffer: file.buffer.buffer,  // File buffer
+          postsSaveFolderPath,
+          originalname: file.originalname,
+          originalUrl: req.originalUrl,
+          ip: req.ip
+        }
       });
-      countOfImages++
-      local_postPics.push(postImages);
-    } catch (err) {
-      createLogs({
-        route: "createPosts",
-        LogMessage: err,
-        originalUrl: 'Error Logs',
-        username: 'Error Logs',
-        ip: 'Error Logs',
-        logLevel: 'error'
+
+      worker.on('message', (message) => {
+        if (message.success) {
+          local_postPics.push(message.filename);
+          countOfImages++;
+        } else {
+          console.error(`Worker error: ${message.error}`);
+        }
+        resolve();
       });
-    }
-  }
+
+      worker.on('error', (error) => {
+        console.error(`Worker encountered an error: ${error}`);
+        reject(error);
+      });
+    });
+  });
+
+  await Promise.all(workerPromises);
 
   createLogs({
     route: "createPosts",
@@ -166,6 +165,5 @@ const processFiles = async (files, postsSaveFolderPath, local_username, req) => 
 
   return local_postPics;
 };
-
 
 

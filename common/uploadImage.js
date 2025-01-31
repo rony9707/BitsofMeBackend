@@ -6,7 +6,6 @@ const storeImages = require('../common/storeImage')
 const upload = (customDir) => {
  return multer({
     storage: storeImages(customDir), 
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
     fileFilter: (req, file, cb) => {
       // Allow only images
       const fileTypes = /jpeg|jpg|png|webp/;

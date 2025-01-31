@@ -27,7 +27,6 @@ const processImageTowebp = async (fileBuffer, customDir, filename, originalUrl, 
 
     // Convert image to 450x450 WebP format and upload to ImageKit
     const webpBuffer = await sharp(fileBuffer)
-      .resize(450, 450) // Resize to 450x450
       .webp({ quality: 80 }) // Convert to WebP with 80% quality
       .toBuffer(); // Get the processed image as a buffer
 
