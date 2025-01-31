@@ -232,7 +232,7 @@ const registerUser = async (req, res) => {
         const mailOptions = {
           from: myEmail,
           to: local_email,
-          subject: 'Welcome to Rony Inc',
+          subject: 'Welcome to Bits of Me Inc',
           html: htmlTemplate,
         };
 
