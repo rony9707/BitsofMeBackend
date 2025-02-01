@@ -1,6 +1,6 @@
 require('dotenv').config()
 const processImageTowebp = require('../../common/processImageTowebp')
-const createLogs = require('../../common/createMongoLogs')
+const createLogs = require('../../common/createPaperTrailLogs')
 const getCurrentDateTime = require('../../common/getCurrentDateTime')
 const bcrypt = require('bcryptjs')
 const userSchema = require('../../models/user')

@@ -1,13 +1,14 @@
-const createLogs = require('../../common/createMongoLogs')
+const createLogs = require('../../common/createPaperTrailLogs')
 
 exports.logoutUser = async (req, res) => {
   try {
     const local_userId = req.user._id;
+
     createLogs({
       route: "logout",
       LogMessage: `User ${local_userId} is trying to log out`,
       originalUrl: req.originalUrl,
-      username: req.body.username,
+      username: local_userId,
       ip: req.ip,
       logLevel: 'info'
     });
@@ -28,7 +29,7 @@ exports.logoutUser = async (req, res) => {
       route: "logout",
       LogMessage: `User ${local_userId} logged out`,
       originalUrl: req.originalUrl,
-      username: req.body.username,
+      username: local_userId,
       ip: req.ip,
       logLevel: 'info'
     });

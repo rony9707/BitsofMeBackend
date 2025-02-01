@@ -1,5 +1,5 @@
 const userSchema = require('../../models/user')
-const createLogs = require('../../common/createMongoLogs')
+const createLogs = require('../../common/createPaperTrailLogs')
 
 
 exports.getUser = async (req, res) => {

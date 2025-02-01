@@ -1,6 +1,6 @@
 const sharp = require('sharp'); // Import sharp for image processing
 const path = require('path');
-const createLogs = require('../common/createMongoLogs');
+const createLogs = require('../common/createPaperTrailLogs');
 const ImageKit = require("imagekit");
 require('dotenv').config()
 

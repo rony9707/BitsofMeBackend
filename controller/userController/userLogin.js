@@ -3,7 +3,7 @@ const userSchema = require('../../models/user')
 const getCurrentDateTime = require('../../common/getCurrentDateTime')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const createLogs = require('../../common/createMongoLogs')
+const createLogs = require('../../common/createPaperTrailLogs')
 
 
 
