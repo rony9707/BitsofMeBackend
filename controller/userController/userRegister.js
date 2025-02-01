@@ -237,14 +237,16 @@ const registerUser = async (req, res) => {
         };
 
         sentEmail(mailOptions, local_email, req.originalUrl, local_username, req.ip)
+
+        // Send response
+        res.json({
+          message: `User ${local_username} has been Registered.`,
+        });
       })
       //Sent Email LOGIC END--------------------------------------------------------------------------
 
 
-      // Send response with image URL
-      res.json({
-        message: `User ${local_username} has been Registered.`,
-      });
+
     }
 
   } catch (err) {
