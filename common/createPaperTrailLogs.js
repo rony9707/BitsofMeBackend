@@ -55,7 +55,8 @@ const logger = winston.createLogger({
   transports: [
     new PapertrailTransport({
       host: paperTrailURL, // Your Papertrail host
-      port: paperTrailPORT, // Your Papertrail port
+      port: paperTrailPORT, // Your Papertrail port,
+      program: 'BitsofMeBackend'
     }),
   ],
 });
