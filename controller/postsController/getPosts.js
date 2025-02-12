@@ -9,6 +9,7 @@ exports.getPosts = async (req, res) => {
     // Extract `limit`, `page`, `db_postTopic`, `tags`, and `db_postVisibility` parameters from the query string
     const limit = parseInt(req.query.limit, 10) || 10; // Default limit: 10
     const page = parseInt(req.query.page, 10) || 1;   // Default page: 1
+    const db_username = req.query.db_username || null;
     const db_postTopic = req.query.db_postTopic || null; // Default: null (fetch all posts)
     const tags = req.query.tags ? req.query.tags.split(',') : null; // Split tags into an array if provided
     const db_postVisibility = req.query.db_postVisibility || null; // Default: null (fetch all visibility)
@@ -20,18 +21,21 @@ exports.getPosts = async (req, res) => {
     // Build the query object
     const query = {};
     if (db_postTopic) query.db_postTopic = db_postTopic;
-    if (tags) query.db_tags = { $all: tags }; // Ensure all specified tags are present
+    if (db_username) query.db_username = db_username;
+    if (tags) {
+      query.db_tags = { $in: tags.map(tag => new RegExp(tag, 'i')) };
+    }
     if (db_postVisibility) query.db_postVisibility = db_postVisibility;
 
     // Fetch posts sorted by `db_postCreationDate` (latest first) with pagination
     const posts = await postSchema.find(query)
-      .sort({ db_postCreationDate: -1 }) // Sort by latest `db_postCreationDate`
+      .sort({ db_postCreationDateUTC: -1 }) // Sort by latest `db_postCreationDate`
       .skip(skip)
       .limit(limit);
 
     // Add a dynamic postID to each post
     const response = posts.map((post, index) => {
-      const { __v, db_postEditedStatus, ...filteredPost } = post.toObject(); // Exclude unwanted fields
+      const { __v, db_postEditedStatus,db_postCreationDateUTC, ...filteredPost } = post.toObject(); // Exclude unwanted fields
       return {
         postID: skip + index + 1,
         ...filteredPost,

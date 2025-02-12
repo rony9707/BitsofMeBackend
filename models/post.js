@@ -5,6 +5,10 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  db_username_pfp: {
+    type: String,
+    required: true
+  },
   db_postTopic: {
     type: String,
     required: true
@@ -19,6 +23,10 @@ const postSchema = new mongoose.Schema({
   },
   db_postCreationDate: {
     type: String,
+    required: true
+  },
+  db_postCreationDateUTC: {
+    type: Date,
     required: true
   },
   db_postModificationDate: {

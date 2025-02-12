@@ -34,7 +34,7 @@ function getCurrentFormattedDate() {
   // Correcting the hour if it is 24 to be 00
   hour = hour === '24' ? '00' : hour.padStart(2, '0');
 
-  return `${day}${getOrdinalSuffix(day)} ${month}, ${year} at ${hour}:${minute}:${second} IST`;
+  return `${day}${getOrdinalSuffix(day)} ${month},${year} at ${hour}:${minute}:${second} IST`;
 }
 
 module.exports = getCurrentFormattedDate;

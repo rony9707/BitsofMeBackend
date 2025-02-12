@@ -3,6 +3,7 @@ const createTags = require('../../common/createTags')
 const fs = require('fs');
 const processImageTowebp = require('../../common/processImageTowebp')
 const postSchema = require('../../models/post')
+const userSchema = require('../../models/user')
 const createLogs = require('../../common/createPaperTrailLogs')
 const { performance } = require('perf_hooks');
 const { Worker } = require('worker_threads');
@@ -43,6 +44,7 @@ exports.createPosts = async (req, res) => {
 
     //Declare the other variables here
     let local_username = req.body.username
+    let local_username_pfp='';
     let local_postTopic = req.body.postTopic
     let local_postText = ''
     let local_postVisibility = req.body.visibility;
@@ -51,6 +53,10 @@ exports.createPosts = async (req, res) => {
     let local_tags = []//Create tags to search better
     let local_postEditedStatus = false
     let local_postPics = [];
+
+    if(local_username){
+      local_username_pfp = await getUserProfilePic(local_username);
+    }
 
     //Post Text can be empty, only images
     if (req.body.posttext) {
@@ -65,10 +71,12 @@ exports.createPosts = async (req, res) => {
 
     const postData = new postSchema({
       db_username: local_username,
+      db_username_pfp: local_username_pfp,
       db_postTopic: local_postTopic,
       db_postText: local_postText,
       db_postVisibility: local_postVisibility,
       db_postCreationDate: local_postCreationDate,
+      db_postCreationDateUTC:new Date(),
       db_postModificationDate: local_PostModificationDate,
       db_tags: local_tags,
       db_postEditedStatus: local_postEditedStatus,
@@ -166,4 +174,20 @@ const processFiles = async (files, postsSaveFolderPath, local_username, req) => 
   return local_postPics;
 };
 
+
+
+async function getUserProfilePic(username) {
+    try {
+        const user = await userSchema.findOne({ db_username: username }, { db_phofilePic_100: 1, _id: 0 });
+
+        if (user) {
+            return user.db_phofilePic_100; // Return the profile picture URL
+        } else {
+            return null; // User not found
+        }
+    } catch (error) {
+        console.error('Error fetching user profile picture:', error);
+        return null;
+    }
+}
 
