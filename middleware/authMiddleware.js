@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
-const createLogs = require('../common/createPaperTrailLogs');
-const User = require('../models/user'); // Import the User model
+const createLogs = require('../common/createPaperTrailLogs')
 
-// Declare Env variables here
-const jwt_key = process.env.jwt;
+
+//Declare Env variables here
+jwt_key = process.env.jwt
 if (!jwt_key) {
   createLogs({
     route: "register",
@@ -16,63 +16,39 @@ if (!jwt_key) {
   process.exit(1);
 }
 
-const authMiddleware = async (req, res, next) => {
-  const authHeader = req.cookies.jwt;
-  const requestUsername = req.headers['x-username']; // Get username from headers
 
-  if (!authHeader) {
+
+const authMiddleware = (req, res, next) => {
+  // console.log(req.cookies.jwt)
+  // console.log(req.headers['authorization'])
+  const authHeader = req.cookies.jwt;
+  if (authHeader) {
+    // const token = authHeader.split(' ')[1];
+    createLogs({
+      route: "getuser",
+      LogMessage: `Authorized access was made`,
+      originalUrl: req.originalUrl,
+      username: 'Not known yet',
+      ip: req.ip,
+      logLevel: 'info'
+    });
+
+    jwt.verify(authHeader, jwt_key, async (err, user) => {
+
+      if (err) return res.status(403).send({ message: "User not authenticated" });
+      req.user = user;
+      next();
+    });
+  } else {
     createLogs({
       route: "getuser",
       LogMessage: `Unauthorized access was made`,
       originalUrl: req.originalUrl,
-      username: 'Unknown',
+      username: 'Not known yet',
       ip: req.ip,
       logLevel: 'error'
     });
-    return res.status(401).send({ message: "User not authenticated" });
-  }
-
-  try {
-    const decoded = jwt.verify(authHeader, jwt_key);
-    const user = await User.findById(decoded._id);
-
-    if (!user) {
-      createLogs({
-        route: "getuser",
-        LogMessage: `User not found in database`,
-        originalUrl: req.originalUrl,
-        username: 'Unknown',
-        ip: req.ip,
-        logLevel: 'error'
-      });
-      return res.status(403).send({ message: "User not authenticated" });
-    }
-
-    // Check if the username matches
-    if (user.username !== requestUsername) {
-      createLogs({
-        route: "getuser",
-        LogMessage: `Username mismatch: JWT and request header do not match`,
-        originalUrl: req.originalUrl,
-        username: requestUsername,
-        ip: req.ip,
-        logLevel: 'error'
-      });
-      return res.status(403).send({ message: "Invalid user credentials" });
-    }
-
-    req.user = user; // Attach user to request
-    next();
-  } catch (err) {
-    createLogs({
-      route: "getuser",
-      LogMessage: `JWT verification failed`,
-      originalUrl: req.originalUrl,
-      username: 'Unknown',
-      ip: req.ip,
-      logLevel: 'error'
-    });
-    return res.status(403).send({ message: "User not authenticated" });
+    res.status(401).send({ message: "User not authenticated" });
   }
 };
 
