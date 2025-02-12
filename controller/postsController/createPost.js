@@ -41,9 +41,11 @@ exports.createPosts = async (req, res) => {
     //   }
     // }
 
+    const local_userId = req.user._id;
+    const user = await userSchema.findOne({ _id: local_userId })
 
     //Declare the other variables here
-    let local_username = req.body.username
+    let local_username = user.db_username;
     let local_username_pfp='';
     let local_postTopic = req.body.postTopic
     let local_postText = ''
