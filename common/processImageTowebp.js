@@ -36,6 +36,10 @@ const processImageTowebp = async (fileBuffer, customDir, filename, originalUrl, 
       folder: customDir // Specify the folder on ImageKit
     });
 
+    // File ID and URL of the uploaded image
+    const ImageFileID = webpUploadResponse.fileId;
+    
+
     webpFilename_original = webpUploadResponse.url
 
     // Conditionally create the 100x100 version for users when registering only
@@ -65,7 +69,7 @@ const processImageTowebp = async (fileBuffer, customDir, filename, originalUrl, 
       });
     }
 
-    return { webpFilename_original, webpFilename_100 };  // Return the WebP 
+    return { webpFilename_original, webpFilename_100, ImageFileID };  // Return the WebP 
   } catch (err) {
     createLogs({
       route: "ERROR",
@@ -77,5 +81,6 @@ const processImageTowebp = async (fileBuffer, customDir, filename, originalUrl, 
     });
   }
 };
+
 
 module.exports = processImageTowebp;

@@ -8,7 +8,7 @@ const processImageTowebp = require('../common/processImageTowebp');
     
 
     // Process image
-    const { webpFilename_original } = await processImageTowebp(
+    const { webpFilename_original, ImageFileID} = await processImageTowebp(
       fileBuffer,  // Use converted buffer
       postsSaveFolderPath,
       originalname,
@@ -18,7 +18,7 @@ const processImageTowebp = require('../common/processImageTowebp');
     
 
     // Send result back to main thread
-    parentPort.postMessage({ success: true, filename: webpFilename_original });
+    parentPort.postMessage({ success: true, filename: webpFilename_original,imageID:ImageFileID });
 
   } catch (err) {
     parentPort.postMessage({ success: false, error: err.message });

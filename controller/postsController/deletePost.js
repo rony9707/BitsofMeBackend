@@ -1,6 +1,7 @@
 const postSchema = require('../../models/post');
 const userSchema = require('../../models/user');
 const createLogs = require('../../common/createPaperTrailLogs');
+const deleteImagesFromImageKit = require('../../common/deletePicsfromImageKit')
 
 exports.deletePost = async (req, res) => {
     try {
@@ -22,6 +23,10 @@ exports.deletePost = async (req, res) => {
         if (post.db_username !== user.db_username) {
             return res.status(403).json({ message: "Unauthorized: You can't delete this post" });
         }
+
+        //ImageKit Post ID's Delete
+        postIDs=post.db_postPicFileIds
+        await deleteImagesFromImageKit(postIDs);
 
         // Delete the post
         await postSchema.deleteOne({ _id: req.body.postID });

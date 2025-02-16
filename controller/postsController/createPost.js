@@ -55,6 +55,7 @@ exports.createPosts = async (req, res) => {
     let local_tags = []//Create tags to search better
     let local_postEditedStatus = false
     let local_postPics = [];
+    let local_postPicsID=[];
 
     if(local_username){
       local_username_pfp = await getUserProfilePic(local_username);
@@ -68,7 +69,9 @@ exports.createPosts = async (req, res) => {
 
     //Post Images can be empty, only text
     if (req.files) {
-      local_postPics = await processFiles(req.files, '/Posts', local_username, req);
+      const processedFiles = await processFiles(req.files, '/Posts', local_username, req);
+      local_postPics = processedFiles.local_postPics;
+      local_postPicsID = processedFiles.local_postPicsID;
     }
 
     const postData = new postSchema({
@@ -82,7 +85,8 @@ exports.createPosts = async (req, res) => {
       db_postModificationDate: local_PostModificationDate,
       db_tags: local_tags,
       db_postEditedStatus: local_postEditedStatus,
-      db_postPics: local_postPics
+      db_postPics: local_postPics,
+      db_postPicFileIds: local_postPicsID
     });
 
     // Save the postData to the database
@@ -130,10 +134,11 @@ exports.createPosts = async (req, res) => {
 
 const processFiles = async (files, postsSaveFolderPath, local_username, req) => {
   const local_postPics = [];
+  const local_postPicsID=[];
   const start = performance.now();
   let countOfImages = 0;
-
   const workerPromises = files.map(file => {
+
     return new Promise((resolve, reject) => {
       const worker = new Worker(path.join(__dirname, '../../common/processImageWorker.js'), {
         workerData: {
@@ -148,6 +153,7 @@ const processFiles = async (files, postsSaveFolderPath, local_username, req) => 
       worker.on('message', (message) => {
         if (message.success) {
           local_postPics.push(message.filename);
+          local_postPicsID.push(message.imageID);
           countOfImages++;
         } else {
           console.error(`Worker error: ${message.error}`);
@@ -173,7 +179,7 @@ const processFiles = async (files, postsSaveFolderPath, local_username, req) => 
     logLevel: 'info'
   });
 
-  return local_postPics;
+  return { local_postPics, local_postPicsID };
 };
 
 

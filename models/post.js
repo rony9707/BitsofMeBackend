@@ -43,7 +43,11 @@ const postSchema = new mongoose.Schema({
   },
   db_postPics: {
     type: [String]
-  }
+  },
+  db_postPicFileIds: 
+  { 
+    type: [String] 
+  } 
 });
 
 
