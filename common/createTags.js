@@ -23,7 +23,7 @@ const cleanString = (str) => {
     .toLowerCase() // Convert to lowercase
     .replace(/[^\w\s]/g, '') // Remove punctuation
     .split(/\s+/) // Split into words
-    .filter(word => !stopWords.includes(word) && word.length > 2); // Remove stop words and short words
+    .filter(word => !stopWords.includes(word) && word.length >= 2); // Remove stop words and short words
 };
 
 
