@@ -35,7 +35,7 @@ exports.getPosts = async (req, res) => {
 
     // Add a dynamic postID to each post
     const response = posts.map((post, index) => {
-      const { __v, db_postEditedStatus,db_postCreationDateUTC, ...filteredPost } = post.toObject(); // Exclude unwanted fields
+      const { __v, db_postEditedStatus, ...filteredPost } = post.toObject(); // Exclude unwanted fields
       return {
         postID: skip + index + 1,
         ...filteredPost,
