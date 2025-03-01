@@ -5,6 +5,7 @@ require('dotenv').config()
 const fs = require('fs');
 const path = require('path');
 const emailTransporter = require('../../common/emailConfig')
+const nodemailer = require('nodemailer')
 
 
 jwt_key = process.env.jwt
