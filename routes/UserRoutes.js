@@ -6,11 +6,15 @@ const userLoginController = require('../controller/userController/userLogin')
 const authMiddleware = require('../middleware/authMiddleware')
 const userGetController = require('../controller/userController/userGet')
 const userLogoutController = require('../controller/userController/userLogout')
-
+const userForgotPasswordController = require('../controller/userController/forgotPassword')
+const usergetResetPasswordController = require('../controller/userController/getResetPassword')
+const userResetPasswordController = require('../controller/userController/resetPassword')
 
 router.post('/register', upload('uploads/profilePic').single('image'), registerUser)
 router.post('/login', userLoginController.loginUser)
 router.get('/getUser', authMiddleware, userGetController.getUser)
 router.post('/logout', authMiddleware, userLogoutController.logoutUser)
-
+router.post('/forgotPassword', userForgotPasswordController.forgotpassword)
+router.get('/reset-password/:username/:token', usergetResetPasswordController.getResetPassword)
+router.put('/resetPassword', userResetPasswordController.resetPassword)
 module.exports = router;
