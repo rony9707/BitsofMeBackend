@@ -10,6 +10,9 @@ const emailTransporter = require('../../common/emailConfig')
 jwt_key = process.env.jwt
 frontEndConnectionString = process.env.frontEndConnectionString
 myEmail = process.env.email
+myPassword = process.env.password
+
+
 exports.forgotpassword = async (req, res) => {
   try {
     //This below code userSchema that if the data present in username property is present in username or email field in db
@@ -48,6 +51,17 @@ exports.forgotpassword = async (req, res) => {
       htmlTemplate = htmlTemplate.replace('{{username}}', user.db_username);
       htmlTemplate = htmlTemplate.replace('{{link}}', link);
 
+      //mail config
+      let config = {
+        service: 'gmail',
+        auth: {
+          user: myEmail,
+          pass: myPassword
+        }
+      }
+
+      //let transporter = nodemailer.createTransport(config)
+
       const mailOptions = {
         from: myEmail,
         to: user.db_email,
@@ -55,12 +69,23 @@ exports.forgotpassword = async (req, res) => {
         html: htmlTemplate,
       };
 
-      sentEmail(mailOptions)
+      let transporter = nodemailer.createTransport(config)
 
-      // Send response
-      res.json({
-        message: `The Forget Password Link has been sent to your email. The Link will be valid for 15 min`,
-      });
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+
+        }
+        else {
+          // Send response
+          res.json({
+            message: `The Forget Password Link has been sent to your email. The Link will be valid for 15 min`,
+          });
+        }
+      })
+
+      //sentEmail(mailOptions)
+
+
     })
     //Sent Email LOGIC END--------------------------------------------------------------------------
   }
