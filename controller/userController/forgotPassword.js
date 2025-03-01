@@ -74,7 +74,9 @@ exports.forgotpassword = async (req, res) => {
 
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
-
+          return res.status(400).send({
+            message: err
+          })
         }
         else {
           // Send response

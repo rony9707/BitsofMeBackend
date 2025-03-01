@@ -5,11 +5,13 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const getCurrentDateTime = require('../../common/getCurrentDateTime');
 const emailTransporter = require('../../common/emailConfig');
+const nodemailer = require('nodemailer')
 
 require('dotenv').config();
 
 const jwt_key = process.env.jwt;
 const myEmail = process.env.email;
+const myPassword = process.env.password
 
 
 exports.resetPassword = async (req, res) => {
@@ -19,7 +21,7 @@ exports.resetPassword = async (req, res) => {
     const { password, token } = req.body;
     // Verify JWT token to get the username
     const decoded = jwt.verify(req.body.token, jwt_key);
-    local_username=decoded.username
+    local_username = decoded.username
 
 
     if (!local_username) return;  // If already responded, stop further execution
@@ -52,22 +54,44 @@ exports.resetPassword = async (req, res) => {
       if (err) {
         console.log(err);
       } else {
+
         htmlTemplate = htmlTemplate.replace('{{username}}', user.db_username);
+
+        //mail config
+        let config = {
+          service: 'gmail',
+          auth: {
+            user: myEmail,
+            pass: myPassword
+          }
+        }
+
         const mailOptions = {
           from: myEmail,
           to: user.db_email,
           subject: 'Bits of M3 Rony Inc Password Reset Successful',
           html: htmlTemplate,
         };
-        sendEmail(mailOptions);
+
+        let transporter = nodemailer.createTransport(config)
+
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) {
+            return res.status(400).send({
+              message: err
+            })
+          }
+          else {
+            // Send response
+            res.json({
+              message: `Password has been updated successfully`,
+            });
+          }
+        })
+
+        //sendEmail(mailOptions);
       }
     });
-
-    // Send response to client (outside fs.readFile, so it's guaranteed to run)
-    if (!responseSent) {
-      responseSent = true;
-      res.json({ message: `Password has been updated successfully` });
-    }
 
   } catch (error) {
     if (!responseSent) {
