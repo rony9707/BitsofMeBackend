@@ -5,15 +5,19 @@ const nodemailer = require('nodemailer');
 const myEmail = process.env.email;
 const myPassword = process.env.password;
 
+
 // Create transporter with explicit host/port (recommended)
 let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,                // Use 465 for SSL
-    secure: true,              // true for 465, false for 587
-    auth: {
-        user: myEmail,
-        pass: myPassword       // This must be an App Password if using 2FA
-    }
+  host: 'smtp.gmail.com',
+  port: 587,  // Try 587 if 465 fails
+  secure: false,  // Must be false for STARTTLS
+  auth: {
+    user: process.env.email,
+    pass: process.env.password
+  },
+  logger: true,  // Log all SMTP traffic
+  debug: true    // More verbose output
 });
+
 
 module.exports = transporter;
